@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import mk_model as model
+import snscrape.modules.twitter as sntwitter
 
 app = FastAPI()
 
@@ -9,19 +11,18 @@ class Msg(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World. Welcome to FastAPI!"}
+    return {"message": 'hey'}
 
+@app.get("/{count}")
+async def count_get(count: int):
+    vectoriser, LRmodel = model.load_models()
+    if count > 100:
+        count = 100
+    query = "(Бугарија OR бугарија)"
+    tweets = []
+    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
+        if i > count:  # only retrieve count tweets
+            break
+        tweets.append(model.predict(vectoriser, LRmodel, [tweet.content]))
 
-@app.get("/path")
-async def demo_get():
-    return {"message": "This is /path endpoint, use a post request to transform the text to uppercase"}
-
-
-@app.post("/path")
-async def demo_post(inp: Msg):
-    return {"message": inp.msg.upper()}
-
-
-@app.get("/path/{path_id}")
-async def demo_get_path_id(path_id: int):
-    return {"message": f"This is /path/{path_id} endpoint, use post request to retrieve result"}
+    return {"tweets": tweets}
