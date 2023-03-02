@@ -23,6 +23,6 @@ async def count_get(count: int):
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
         if i > count:  # only retrieve count tweets
             break
-        tweets.append(model.predict(vectoriser, LRmodel, [tweet.content]))
+        tweets.append(model.predict(vectoriser, LRmodel, [tweet.rawContent]))
 
     return {"tweets": tweets}

@@ -3,9 +3,12 @@ import re
 import pickle
 import numpy as np
 import pandas as pd
+import nltk
 
 # nltk
 from nltk.stem import WordNetLemmatizer
+
+nltk.download('wordnet')
 
 # sklearn
 from sklearn.svm import LinearSVC
