@@ -29,18 +29,7 @@ emojis = {':)': 'насмевка', ':-)': 'насмевка', ';d': 'намиг
           ';-)': 'намигнување', 'О:-)': 'ангел','О*-)': 'ангел','(:-D': 'озборувања', '=^.^=' : 'мачка'}
 
 ## Defining set containing all stopwords in english.
-stopwordlist = ['а', 'за', 'горе', 'после', 'повторно', 'не', 
-    'сите', 'сум', 'на', 'и', 'било кој', 'се', 'како', 'во', 
-    'биде', 'бидејќи', 'било', 'порано', 'да се биде', 'подолу', 'помеѓу', 
-    'двајцата', 'од', 'може', 'г', 'направи', 'прави', 'долу', 'за време', 
-    'секоја', 'неколку', 'понатаму', 'имаше', 'има', 'тој', 'неа', 'тука', 
-    'нејзино', 'сама', 'самиот', 'негов', 'јас', 'ако', 'е', 'тоа', 'него', 
-    'само', 'л', 'м', 'ма', 'повеќе', 'повеќето', 'моето', 'сега', 'о', 'еднаш', 
-    'или', 'други', 'наши', 'надвор', 'сопствени', 'с', 'исто', 'таа', 'треба', 
-    'така', 'некои', 't', 'нивните', 'тогаш', 'таму', 'овие', 'тие', 'ова', 'преку', 
-    'до', 'премногу', 'под', 'ве', 'многу', 'беше', 'ние', 'бевме', 'што', 'кога', 
-    'каде', 'кое', 'додека', 'кој', 'кого', 'зошто', 'ќе', 'со', 'победи', 'ти', 
-    'вие', 'ваши', 'себе']
+stopwordlist = ['и', 'или', 'но', 'а', 'со', 'до', 'за', 'во', 'од', 'на', 'не', 'се', 'ќе', 'ме', 'те', 'го', 'ја', 'ни', 'нека', 'би', 'да', 'си', 'ве', 'им', 'му', 'ѝ', 'им', 'нив', 'многу', 'повеќе', 'најмногу', 'меѓутоа', 'односно', 'па', 'при', 'што', 'така', 'токму', 'туку', 'џабе']
 
 def preprocess(textdata):
     processedText = []
@@ -49,39 +38,46 @@ def preprocess(textdata):
     wordLemm = WordNetLemmatizer()
     
     # Defining regex patterns.
-    urlPattern        = r"((http://)[^ ]*|(https://)[^ ]*|( www\.)[^ ]*)"
-    userPattern       = '@[^\s]+'
+    urlPattern = r'(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})'
+    # urlPattern        = r'https?://[A-Za-z0-9./]+'
+    userPattern       = r'@\w+'
     # alhpabet pattern for macedonian alhpabet.
-    alphaPattern      = "/^[абвгдѓежзѕијклљмнњопрстќуфхцчџш]+$/"
+    alphaPattern      = r"[^абвгдѓежзѕијклљмнњопрстќуфхцчџш]+"
     sequencePattern   = r"(.)\1\1+"
     seqReplacePattern = r"\1\1"
     
     for tweet in textdata:
         tweet = tweet.lower()
-        
+        print(tweet)
         # Replace all URls with 'URL'
-        tweet = re.sub(urlPattern,' URL',tweet)
+        tweet = re.sub(urlPattern,' ЛИНК',tweet)
+        print(tweet)
+
         # Replace all emojis.
         for emoji in emojis.keys():
-            tweet = tweet.replace(emoji, "EMOJI" + emojis[emoji])        
+            tweet = tweet.replace(emoji, "ЕМОТИКОНА" + emojis[emoji])
+        print(tweet)     
         # Replace @USERNAME to 'USER'.
-        tweet = re.sub(userPattern,' USER', tweet)        
+        tweet = re.sub(userPattern,' ПОТРЕБИТЕЛ', tweet)
+        print(tweet)        
         # Replace all non alphabets.
         tweet = re.sub(alphaPattern, " ", tweet)
+        print(tweet)
         # Replace 3 or more consecutive letters by 2 letter.
         tweet = re.sub(sequencePattern, seqReplacePattern, tweet)
-
+        print(tweet)
+        print("------------------")
         tweetwords = ''
         for word in tweet.split():
-            # Checking if the word is a stopword.
-            #if word not in stopwordlist:
-            if len(word)>1:
-                # Lemmatizing the word.
-                word = wordLemm.lemmatize(word)
-                tweetwords += (word+' ')
+            if word not in stopwordlist:
+                if len(word)>1:
+                    # Lemmatizing the word.
+                    word = wordLemm.lemmatize(word)
+                    tweetwords += (word+' ')
             
         processedText.append(tweetwords)
-        
+    print("Processed Text: ")
+    print(processedText)
     return processedText
 
 
